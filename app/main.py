@@ -52,23 +52,27 @@ def create_app(
     @asynccontextmanager
     async def lifespan(_: FastAPI) -> AsyncIterator[None]:
         logger.info(
-            "boot env=%s demo_mode=%s data_dir=%s db=%s telegram=%s ai=%s",
+            "boot env=%s demo_mode=%s data_dir=%s db=%s telegram=%s channel=%s ai=%s",
             settings.app_env,
             settings.demo_mode,
             settings.data_dir,
             settings.sqlite_path,
-            "on" if settings.telegram_ready() else "off",
+            "on" if settings.telegram_token_ready() else "off",
+            "on" if settings.telegram_channel_ready() else "off",
             "on" if settings.ai_ready() else "off",
         )
         stop = asyncio.Event()
         poller: asyncio.Task[None] | None = None
-        if settings.telegram_ready():
+        if settings.telegram_token_ready():
             poller = asyncio.create_task(
                 poll_forever(db=db, client=client, settings=settings, stop=stop, triage=triage),
                 name="telegram-poller",
             )
         else:
-            logger.info("telegram poller idle (no bot token / channel id)")
+            logger.info("telegram poller idle (no bot token)")
+        app.state.poller = poller
+        if not settings.telegram_channel_ready():
+            logger.warning("TELEGRAM_CHANNEL_ID is empty — digests cannot be posted yet")
         try:
             yield
         finally:
@@ -111,7 +115,8 @@ def create_app(
             "time": _now(),
             "demo_mode": settings.demo_mode,
             "capabilities": {
-                "telegram": settings.telegram_ready(),
+                "telegram": settings.telegram_token_ready(),
+                "telegram_channel": settings.telegram_channel_ready(),
                 "gemma": settings.ai_ready(),
             },
             "alerts_cached": db.count_alerts(),

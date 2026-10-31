@@ -19,7 +19,8 @@ def test_health_ok() -> None:
     assert body["status"] == "ok"
     assert body["app"] == "SachetSathi"
     assert body["version"] == __version__
-    assert set(body["capabilities"]) == {"telegram", "gemma"}
+    # `telegram` = reports-in (token only); `telegram_channel` = digests-out.
+    assert set(body["capabilities"]) == {"telegram", "telegram_channel", "gemma"}
 
 
 def test_health_does_not_leak_secrets() -> None:
@@ -32,3 +33,51 @@ def test_root_points_at_health() -> None:
     res = _client().get("/")
     assert res.status_code == 200
     assert res.json()["health"] == "/api/health"
+
+
+# ---- capability split: reports-in needs a token, digests-out need a channel --
+
+
+def test_token_only_starts_the_poller(tmp_path) -> None:
+    """Regression: the poller used to require TELEGRAM_CHANNEL_ID and stayed idle."""
+    import dataclasses
+
+    from app.config import get_settings
+    from tests.test_ingest import FakeTelegram
+
+    settings = dataclasses.replace(
+        get_settings(),
+        data_dir=tmp_path,
+        database_url="",
+        telegram_bot_token="123:abc",
+        telegram_channel_id="",
+    )
+    app = create_app(settings, telegram_client=FakeTelegram())
+
+    with TestClient(app) as client:
+        body = client.get("/api/health").json()
+        assert body["capabilities"]["telegram"] is True
+        assert body["capabilities"]["telegram_channel"] is False
+        assert app.state.poller is not None
+        assert not app.state.poller.done()
+
+    assert app.state.poller.done()  # cancelled on shutdown
+
+
+def test_no_token_keeps_the_poller_idle(tmp_path) -> None:
+    import dataclasses
+
+    from app.config import get_settings
+    from tests.test_ingest import FakeTelegram
+
+    settings = dataclasses.replace(
+        get_settings(),
+        data_dir=tmp_path,
+        database_url="",
+        telegram_bot_token="",
+        telegram_channel_id="-1001234567890",
+    )
+    app = create_app(settings, telegram_client=FakeTelegram())
+
+    with TestClient(app):
+        assert app.state.poller is None

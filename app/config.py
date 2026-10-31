@@ -101,7 +101,15 @@ class Settings:
         self.photos_dir.mkdir(parents=True, exist_ok=True)
 
     def telegram_ready(self) -> bool:
-        return bool(self.telegram_bot_token and self.telegram_channel_id)
+        """Can we poll for reports *and* post a digest?"""
+        return self.telegram_token_ready() and self.telegram_channel_ready()
+
+    def telegram_token_ready(self) -> bool:
+        """Reports-in only needs the token; the channel is for digests-out."""
+        return bool(self.telegram_bot_token)
+
+    def telegram_channel_ready(self) -> bool:
+        return bool(self.telegram_channel_id)
 
     def ai_ready(self) -> bool:
         return bool(self.gemini_api_key)
