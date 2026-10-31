@@ -27,10 +27,11 @@
 | **P2** | Telegram ingest (`@sachet_sathi_bot`) + digest (`@sachet_sathi_club`) | ✅ |
 | **P3** | Gemma triage → strict-JSON cards (`gemma-4-26b-a4b-it`) | ✅ |
 | **P4** | Offline PWA (`sw.js`, `manifest.json`, IndexedDB queue) | ✅ |
-| P5 | Deploy to Cloud (Render / DigitalOcean) | ⬜ (in progress / ready) |
-| P6 | Pitch freeze, submission, video | ⬜ (ready) |
+| **P5** | Deploy to Cloud (Render) | ✅ |
 
 Built for **MLH Hacktoberfest Hack Day — Bhubaneswar × DatrixLabs**, Oct 31 2026.
+
+>live link: https://sachet-sathi.onrender.com
 
 ---
 
