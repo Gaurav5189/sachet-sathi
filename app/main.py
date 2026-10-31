@@ -29,6 +29,9 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s %(levelname)s %(name)s :: %(message)s",
 )
+# httpx logs full request URLs at INFO — and the Bot API URL contains the token.
+logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("httpcore").setLevel(logging.WARNING)
 
 
 def _now() -> str:
