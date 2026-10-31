@@ -7,7 +7,7 @@
 - **Data:** sqlite3 (stdlib), fixture JSON files in `fixtures/`.
 - **Frontend:** vanilla HTML/CSS/JS, native service worker, `manifest.json`. No framework, no bundler.
 - **Testing:** pytest (small, focused — triage schema, alerts parser, API health).
-- **Infra:** Dockerfile + docker-compose; DigitalOcean App Platform for deploy.
+- **Infra:** Dockerfile + docker-compose; Render / DigitalOcean App Platform for deploy.
 - **Anything not on this list ⇒ ask the user first.** One yes-and-later beats a half-unknown dependency.
 
 ## 2. Preferred patterns

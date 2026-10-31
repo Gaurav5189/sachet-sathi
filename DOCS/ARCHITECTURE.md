@@ -11,7 +11,7 @@
           │ poller (cron/60s)               │ long-poll ingest           │ digest send
           ▼                                 ▼                            │
 ┌──────────────────────────────────────────────────────────────────────────────────┐
-│ FastAPI core (DigitalOcean App Platform, Docker)                                  │
+│ FastAPI core (Render / DigitalOcean App Platform, Docker)                         │
 │  ├─ alerts.py    parse feeds → alerts table (fixture fallback)                    │
 │  ├─ ingest.py    telegram updates → pending photos/text → incidents table         │
 │  ├─ triage.py    Gemini (Gemma 4, open weights) → strict-JSON incident card       │
@@ -79,7 +79,7 @@ sachet-sathi/
 | Telegram | **python-telegram-bot** (long polling) | Matches the working pattern in `telegram-send-demo` |
 | AI | **Gemma 4 via Google Gemini API** (`google-genai` SDK) | Open-weights brief both categories; free tier |
 | Frontend | Vanilla JS + service worker (no build step) | No bundler = no build failure = the 69% statistic |
-| Deploy | **DigitalOcean App Platform** via Dockerfile | Sponsor-aligned, one-command from repo |
+| Deploy | **Render / DigitalOcean App Platform** via Dockerfile | Containerized, one-click deploy from repo |
 | Validation | **Pydantic models** for every LLM/external shape | Strict contract; see RULES.md |
 
 ## Key decisions

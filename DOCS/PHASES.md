@@ -31,8 +31,8 @@
 - Odia + EN text for safety pack
 **Accept:** DevTools-network-offline → page opens; report queued; toggle online → flush → card lands.
 
-## Phase 5 — Deploy to DigitalOcean (3:45–4:15)
-- Dockerfile final; deploy on App Platform; set env vars (API keys, bot token, channel id)
+## Phase 5 — Deploy to Cloud (Render / DigitalOcean) (3:45–4:15)
+- Dockerfile final; deploy on Render (or DO App Platform); set env vars (API keys, bot token, channel id)
 - Verify `/api/health`, `/api/alerts`, PWA reachable from phone data
 **Accept:** Live public URL working; record it for submission.
 
