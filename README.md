@@ -10,7 +10,7 @@
 | Phase | What | State |
 |---|---|---|
 | P0 | Scaffold, health endpoint, GDACS fixture, container | ✅ |
-| P1 | Alerts pipeline (GDACS RSS → `alerts`) | ⬜ |
+| P1 | Alerts pipeline (GDACS RSS → `alerts`) | ✅ |
 | P2 | Telegram in/out (long polling + digest) | ⬜ |
 | P3 | Gemma triage → strict JSON card | ⬜ |
 | P4 | Offline-capable PWA | ⬜ |
@@ -35,7 +35,7 @@ uv venv .venv && uv pip install --python .venv/bin/python -r requirements-dev.tx
 ## What's here
 
 ```
-app/         FastAPI app (main.py, config.py) — routers arrive per phase
+app/         FastAPI app (main.py, config.py, models.py, alerts.py, api.py)
 fixtures/    Real GDACS feed snapshot (RSS + normalized JSON) for DEMO_MODE
 scripts/     snapshot_gdacs.py — refresh the feed fixture
 tests/       pytest

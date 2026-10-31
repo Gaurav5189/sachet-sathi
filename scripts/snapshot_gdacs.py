@@ -31,6 +31,16 @@ FEED_URL = "https://www.gdacs.org/xml/rss.xml"
 GDACS = "http://www.gdacs.org"
 NS = {"gdacs": GDACS}
 
+# Keep the fixture readable and faithful to the real feed's prefixes.
+for _prefix, _uri in (
+    ("gdacs", GDACS),
+    ("geo", "http://www.w3.org/2003/01/geo/wgs84_pos#"),
+    ("georss", "http://www.georss.org/georss"),
+    ("dc", "http://purl.org/dc/elements/1.1/"),
+    ("glide", "http://glidenumber.net"),
+):
+    ET.register_namespace(_prefix, _uri)
+
 # Keep the fixture small and relevant: the Odisha/Bay-of-Bengal cyclone plus
 # India-wide flood/drought context. Selected by event type + country.
 KEEP_IF = (
@@ -63,8 +73,9 @@ def extract(item: ET.Element) -> dict:
     """Pull the fields we actually render. No interpretation, no invention."""
     g = lambda tag: _text(item, f"gdacs:{tag}")  # noqa: E731
     level = g("alertlevel").lower()
-    lat = item.findtext("geo:lat", namespaces={"geo": "http://www.w3.org/2003/01/geo/wgs84_pos#"})
-    lon = item.findtext("geo:long", namespaces={"geo": "http://www.w3.org/2003/01/geo/wgs84_pos#"})
+    # GDACS nests coordinates inside <geo:Point>, not directly under <item>.
+    lat = item.findtext(".//geo:lat", namespaces={"geo": "http://www.w3.org/2003/01/geo/wgs84_pos#"})
+    lon = item.findtext(".//geo:long", namespaces={"geo": "http://www.w3.org/2003/01/geo/wgs84_pos#"})
     event_id = g("eventid")
     return {
         "id": f"gdacs:{g('eventtype')}{event_id}",

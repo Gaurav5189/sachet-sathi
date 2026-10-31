@@ -15,7 +15,10 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from app import __version__
+from app.alerts import AlertsService
+from app.api import router as api_router
 from app.config import Settings, get_settings
+from app.models import Database
 
 logger = logging.getLogger("sachet")
 logging.basicConfig(
@@ -32,13 +35,17 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or get_settings()
     settings.ensure_dirs()
 
+    db = Database(settings.sqlite_path)
+    db.init()
+
     @asynccontextmanager
     async def lifespan(_: FastAPI) -> AsyncIterator[None]:
         logger.info(
-            "boot env=%s demo_mode=%s data_dir=%s telegram=%s ai=%s",
+            "boot env=%s demo_mode=%s data_dir=%s db=%s telegram=%s ai=%s",
             settings.app_env,
             settings.demo_mode,
             settings.data_dir,
+            settings.sqlite_path,
             "on" if settings.telegram_ready() else "off",
             "on" if settings.ai_ready() else "off",
         )
@@ -54,6 +61,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         lifespan=lifespan,
     )
 
+    app.state.settings = settings
+    app.state.db = db
+    app.state.alerts = AlertsService(settings, db)
+    app.include_router(api_router)
+
     @app.get("/api/health")
     async def health() -> dict:
         """Liveness + capability probe. The demo script calls this first."""
@@ -61,13 +73,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             "status": "ok",
             "app": "SachetSathi",
             "version": __version__,
-            "phase": "p0-scaffold",
+            "phase": "p1-alerts",
             "time": _now(),
             "demo_mode": settings.demo_mode,
             "capabilities": {
                 "telegram": settings.telegram_ready(),
                 "gemma": settings.ai_ready(),
             },
+            "alerts_cached": db.count_alerts(),
         }
 
     @app.get("/")
