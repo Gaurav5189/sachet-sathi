@@ -10,14 +10,17 @@
  *   POST → never cached; the app queues reports in IndexedDB instead
  */
 
-const VERSION = 'v1';
+const VERSION = 'v4';
 const SHELL_CACHE = `sachet-shell-${VERSION}`;
 const API_CACHE = `sachet-api-${VERSION}`;
 const SHELL = [
   '/',
   '/index.html',
-  '/app.js',
+  '/tokens.css',
   '/style.css',
+  '/i18n.js',
+  '/map-data.js',
+  '/app.js',
   '/manifest.json',
   '/safety-pack.json',
   '/icon-192.png',

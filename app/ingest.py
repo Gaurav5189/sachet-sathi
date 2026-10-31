@@ -8,12 +8,15 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from datetime import datetime
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 from app.config import Settings
 from app.models import Database
+from app.alerts import AlertsService
+from app.digest import build_digest, send_digest
 from app.telegram import TelegramClient, deliver, flush_outbox
 from app.triage import TriageService
 
@@ -221,6 +224,61 @@ async def handle_callback(    query: dict[str, Any],
     return IngestOutcome(note=f"callback: {CALLBACK_LABELS[data].lower()}")
 
 
+# ---- event-based digest trigger -------------------------------------------
+
+async def _maybe_digest(
+    db: Database,
+    client: TelegramClient,
+    settings: Settings,
+    triage: TriageService | None,
+) -> None:
+    """Send digest when a severe incident or relevant official alert appears.
+
+    Rate-limited: at most once every 5 minutes, to avoid spamming the channel.
+    """
+    from app.models import utcnow  # avoid circular import at module level
+
+    last_sent_raw = db.get_state("digest_sent_at")
+    now = datetime.fromisoformat(utcnow())
+    if last_sent_raw:
+        try:
+            last_sent = datetime.fromisoformat(last_sent_raw)
+            if (now - last_sent).total_seconds() < 300:  # 5 min rate limit
+                return
+        except ValueError:
+            pass  # corrupt timestamp: treat as old
+
+    # Event conditions: either a triaged severe incident exists OR a current
+    # relevant official alert is present.
+    severe_incidents = db.list_incidents(status="triaged", severity="severe", limit=1)
+    alerts_service = AlertsService(settings, db)
+    current_alerts = alerts_service.feed(demo=False, current_only=True, relevant_only=True, limit=1)
+    has_alert = bool(current_alerts.alerts) and not current_alerts.demo and not current_alerts.stale
+
+    if not severe_incidents and not has_alert:
+        return
+
+    try:
+        result = await send_digest(
+            db,
+            client,
+            alerts_service,
+            chat_id=settings.telegram_channel_id,
+            demo=False,
+        )
+    except Exception:
+        logger.exception("event digest failed")
+        return
+
+    db.set_state("digest_sent_at", utcnow())
+    logger.info(
+        "event digest sent (severe=%d alert=%d) → %s",
+        bool(severe_incidents),
+        bool(has_alert),
+        settings.telegram_channel_id,
+    )
+
+
 async def poll_forever(
     *,
     db: Database,
@@ -259,6 +317,13 @@ async def poll_forever(
             await flush_outbox(db, client)
         except Exception:  # noqa: BLE001
             logger.exception("outbox flush failed; will retry next cycle")
+
+        # ---- event-based digest: trigger on new severe incident or relevant alert ----
+        if settings.telegram_channel_ready() and settings.telegram_token_ready():
+            try:
+                await _maybe_digest(db, client, settings, triage)
+            except Exception:  # noqa: BLE001
+                logger.exception("auto digest failed; will retry next cycle")
 
         if not updates:
             # Long polling normally blocks; this keeps a misbehaving API from

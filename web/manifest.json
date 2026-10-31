@@ -1,33 +1,24 @@
 {
-  "name": "SachetSathi — cyclone field assistant",
+  "name": "SachetSathi — Odisha disaster alerts",
   "short_name": "SachetSathi",
-  "description": "Official cyclone alerts, field reports and an offline safety pack for coastal Odisha.",
+  "description": "Are you at risk? Official GDACS alerts and community field reports for Odisha, with an offline safety pack.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#0B1220",
   "theme_color": "#0B1220",
-  "orientation": "portrait",
+  "orientation": "portrait-primary",
   "lang": "en",
-  "categories": ["news", "utilities", "weather"],
+  "dir": "ltr",
+  "categories": ["news", "utilities", "weather", "government"],
+  "shortcuts": [
+    { "name": "Report an incident", "short_name": "Report", "url": "/?report=1" },
+    { "name": "Open safety pack", "short_name": "Safety pack", "url": "/?view=safety" },
+    { "name": "Map", "short_name": "Map", "url": "/?view=map" }
+  ],
   "icons": [
-    {
-      "src": "/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    }
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }

@@ -29,7 +29,7 @@
 | P5 | Deploy to DigitalOcean App Platform | ⬜ (ready) |
 | P6 | Pitch freeze, submission, video | ⬜ (ready) |
 
-Built for **MLH Hacktoberfest Hack Day — Bhubaneswar × DatrixLabs**, Oct 31 2026. Deadline: 8:00 PM IST.
+Built for **MLH Hacktoberfest Hack Day — Bhubaneswar × DatrixLabs**, Oct 31 2026.
 
 ---
 
@@ -216,7 +216,7 @@ sachet-sathi/
 
 ---
 
-## ⚠️ Limitations (honest)
+## ⚠️ Limitations
 
 - **Model inference is remote only** (no on-device Gemma). During network loss, triage pauses; the fallback classifier continues.
 - **Digest requires the bot to be a channel/group admin**; without it, `POST /api/digest` returns 409 (`channel_not_configured`).
@@ -229,7 +229,7 @@ sachet-sathi/
 ## 🏆 MLH / Hackathon submission
 
 **Tracks:**
-- **Best Open-Source AI Project** (DigitalOcean) — open-weight Gemma load, no proprietary model
+- **Best Open-Source AI Project** (DigitalOcean) — open-weight Gemma load, no proprietary model (main for this project)
 - **Best Use of Gemma 4** — `gemma-4-26b-a4b-it` confirmed live, vision + Odia output verified
 
 **What judges see in <2 minutes:**

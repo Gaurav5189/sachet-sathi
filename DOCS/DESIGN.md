@@ -1,5 +1,10 @@
 # DESIGN — SachetSathi
 
+> **Redesign note:** the palette, type scale and layout below describe the first
+> build. The shipped design system now lives in `web/tokens.css` (dark · light ·
+> Sunlight) and `web/style.css`; see `web/REDESIGN.md` for the current tokens,
+> components, breakpoints and the problem-by-problem changelog.
+
 > Built to be legible on a cracked phone screen at 2 a.m. Low light, high contrast, no shading games.
 
 ## Color palette (tokens in `web/style.css`)

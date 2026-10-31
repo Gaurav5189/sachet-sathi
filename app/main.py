@@ -14,6 +14,7 @@ from typing import AsyncIterator
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -107,6 +108,9 @@ def create_app(
     app.state.alerts = AlertsService(settings, db)
     app.state.telegram = client
     app.state.triage = triage
+    # Ship the shell compressed: the PWA budget (LCP < 2 s on slow 3G) assumes
+    # gzipped assets, and App Platform/CDNs re-compress anyway. Stdlib only.
+    app.add_middleware(GZipMiddleware, minimum_size=500)
     app.include_router(api_router)
 
     @app.get("/api/health")

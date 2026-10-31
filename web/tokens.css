@@ -1,0 +1,245 @@
+/* SachetSathi design tokens.
+ *
+ * Three themes, one variable contract:
+ *   dark      — default; read at 2 a.m. on a cracked screen
+ *   light     — daylight, low glare
+ *   sunlight  — bright sun outdoors; maximum contrast, heavy rules, no greys
+ *
+ * Rules baked in: body text >= 16px, meta never below a 4.5:1 pair, severity
+ * is never colour alone (an icon + label always ride along), 8px spacing grid,
+ * 16px card radius, 44px minimum tap target.
+ */
+
+:root {
+  /* ---- type ---- */
+  --font-latin: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans Oriya", sans-serif;
+  --font-odia: "Noto Sans Oriya", "Noto Sans Odia", system-ui, var(--font-latin);
+  --font: var(--font-latin);
+
+  --fs-12: 0.75rem;   /* badges only */
+  --fs-13: 0.8125rem; /* meta */
+  --fs-14: 0.875rem;  /* secondary */
+  --fs-16: 1rem;      /* body minimum */
+  --fs-20: 1.25rem;   /* card / section title */
+  --fs-28: 1.75rem;   /* hero status */
+
+  --lh-body: 1.5;
+  --lh-odia: 1.6;
+  --lh-tight: 1.25;
+
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+
+  /* ---- spacing (8px grid) ---- */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 20px;
+  --s-6: 24px;
+  --s-8: 32px;
+
+  /* ---- shape ---- */
+  --r-sm: 10px;
+  --r-card: 16px;
+  --r-lg: 20px;
+  --r-pill: 999px;
+  --tap: 44px;
+
+  /* ---- motion ---- */
+  --t-fast: 120ms;
+  --t-base: 180ms;
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ---- layout ---- */
+  --appbar-h: 116px;
+  --filterbar-h: 0px;
+  --maxw: 720px;
+
+  /* ---- severity (brand constants, theme-independent) ---- */
+  --sev-severe: #ef4444;
+  --sev-moderate: #f59e0b;
+  --sev-low: #22c55e;
+  --sev-info: #3b82f6;
+  /* text-safe inks for small labels (contrast-checked per theme) */
+  --ink-moderate: #fcd34d;
+  --ink-telegram: #7dd3fc;
+
+  color-scheme: dark;
+}
+
+/* =====================================================================
+   DARK (default)
+   ===================================================================== */
+:root,
+[data-theme="dark"] {
+  --bg: #0b1220;
+  --bg-2: #0a0f1a;
+  --surface: #111c2e;
+  --surface-2: #16233a;
+  --surface-3: #1d2c46;
+  --overlay: rgb(3 7 18 / 0.72);
+  --border: #24344f;
+  --border-strong: #3a5175;
+
+  --text: #f1f5f9;
+  --text-2: #cbd5e1;   /* meta — ~10:1 on --bg */
+  --text-3: #9fb0c6;   /* faint but still > 4.5:1 */
+
+  --accent: #3b82f6;
+  --accent-fill: #2563eb;
+  --accent-ink: #ffffff;
+  --accent-soft: rgb(59 130 246 / 0.16);
+  --ok: #22c55e;
+  --warn: #f59e0b;
+  --danger: #ef4444;
+
+  --hero-safe-bg: linear-gradient(180deg, #0f2a1c 0%, #0c1f16 100%);
+  --hero-safe-br: #1f6b45;
+  --hero-watch-bg: linear-gradient(180deg, #3a2606 0%, #2a1c06 100%);
+  --hero-watch-br: #8a5a10;
+  --hero-danger-bg: linear-gradient(180deg, #450a0a 0%, #2e0606 100%);
+  --hero-danger-br: #9b1c1c;
+  --hero-danger-fg: #fee2e2;
+  --hero-danger-muted: #fecaca;
+  --hero-danger-line: rgb(255 255 255 / 0.24);
+  --hero-danger-chip: rgb(255 255 255 / 0.14);
+  --sev-banner-bg: #b91c1c;
+  --sev-severe-fill: #b91c1c;
+  --sev-banner-fg: #ffffff;
+
+  --sev-severe-bg: linear-gradient(180deg, #450a0a 0%, #3f0a0a 55%, #2e0606 100%);
+  --sev-severe-br: #7f1d1d;
+  --sev-severe-fg: #fee2e2;
+  --sev-moderate-bg: linear-gradient(180deg, #3b2405 0%, #2c1d05 100%);
+  --sev-moderate-br: #78350f;
+  --sev-moderate-fg: #fde68a;
+  --sev-low-bg: var(--surface);
+  --sev-low-br: var(--border);
+  --sev-low-fg: var(--text);
+
+  --shadow-1: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-2: 0 8px 24px rgb(0 0 0 / 0.45);
+  --card-border-w: 1px;
+  --card-accent-w: 4px;
+}
+
+/* =====================================================================
+   LIGHT
+   ===================================================================== */
+[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f4f7fb;
+  --bg-2: #eef2f8;
+  --surface: #ffffff;
+  --surface-2: #f1f5f9;
+  --surface-3: #e6ecf4;
+  --overlay: rgb(15 23 42 / 0.45);
+  --border: #d7e0ec;
+  --border-strong: #b0bfd4;
+
+  --text: #0f172a;
+  --text-2: #3b4a60;   /* ~9:1 on white */
+  --text-3: #55657c;   /* ~6:1 on white */
+
+  --accent: #1d4ed8;
+  --accent-fill: #1d4ed8;
+  --accent-ink: #ffffff;
+  --accent-soft: rgb(29 78 216 / 0.1);
+
+  --hero-safe-bg: linear-gradient(180deg, #e7f8ee 0%, #d8f1e4 100%);
+  --hero-safe-br: #86cfa8;
+  --hero-watch-bg: linear-gradient(180deg, #fff7e6 0%, #fdeccb 100%);
+  --hero-watch-br: #f0b54a;
+  --hero-danger-bg: linear-gradient(180deg, #fef2f2 0%, #fde4e4 100%);
+  --hero-danger-br: #ef8f8f;
+  --hero-danger-fg: #7f1d1d;
+  --hero-danger-muted: #6b1a1a;
+  --hero-danger-line: #ef8f8f;
+  --hero-danger-chip: rgb(127 29 29 / 0.08);
+  --sev-banner-bg: #b91c1c;
+  --sev-severe-fill: #b91c1c;
+  --sev-banner-fg: #ffffff;
+
+  --sev-severe-bg: linear-gradient(180deg, #fef2f2 0%, #fde2e2 100%);
+  --sev-severe-br: #f3a6a6;
+  --sev-severe-fg: #7f1d1d;
+  --sev-moderate-bg: linear-gradient(180deg, #fffbeb 0%, #fef0c9 100%);
+  --sev-moderate-br: #f2c14e;
+  --sev-moderate-fg: #713f12;
+  --ink-moderate: #92400e;
+  --ink-telegram: #0b6a95;
+  --sev-low-bg: var(--surface);
+  --sev-low-br: var(--border);
+  --sev-low-fg: var(--text);
+
+  --shadow-1: 0 1px 2px rgb(15 23 42 / 0.08);
+  --shadow-2: 0 8px 24px rgb(15 23 42 / 0.12);
+  --card-border-w: 1px;
+  --card-accent-w: 4px;
+}
+
+/* =====================================================================
+   SUNLIGHT — high contrast for bright outdoor glare.
+   White paper, black ink, thick rules, saturated accents. No soft greys.
+   ===================================================================== */
+[data-theme="sunlight"] {
+  color-scheme: light;
+  --bg: #ffffff;
+  --bg-2: #ffffff;
+  --surface: #ffffff;
+  --surface-2: #f2f2f2;
+  --surface-3: #e6e6e6;
+  --overlay: rgb(0 0 0 / 0.55);
+  --border: #000000;
+  --border-strong: #000000;
+
+  --text: #000000;
+  --text-2: #1a1a1a;
+  --text-3: #333333;
+
+  --accent: #0b3ea8;
+  --accent-fill: #0b3ea8;
+  --accent-ink: #ffffff;
+  --accent-soft: #dbe6ff;
+
+  --hero-safe-bg: #e7fff0;
+  --hero-safe-br: #006b2e;
+  --hero-watch-bg: #fff4d6;
+  --hero-watch-br: #8a5a00;
+  --hero-danger-bg: #7f1d1d;
+  --hero-danger-br: #000000;
+  --hero-danger-fg: #ffffff;
+  --hero-danger-muted: #ffe4e4;
+  --hero-danger-line: #ffb4b4;
+  --hero-danger-chip: rgb(255 255 255 / 0.16);
+  --sev-banner-bg: #7f1d1d;
+  --sev-severe-fill: #7f1d1d;
+  --sev-banner-fg: #ffffff;
+
+  --sev-severe-bg: #7f1d1d;
+  --sev-severe-br: #000000;
+  --sev-severe-fg: #ffffff;
+  --sev-moderate-bg: #ffe9a8;
+  --sev-moderate-br: #7a4a00;
+  --sev-moderate-fg: #3b2500;
+  --ink-moderate: #7a3d00;
+  --ink-telegram: #0b5f86;
+  --sev-low-bg: #ffffff;
+  --sev-low-br: #000000;
+  --sev-low-fg: #000000;
+
+  --shadow-1: none;
+  --shadow-2: 0 4px 0 rgb(0 0 0 / 1);
+  --card-border-w: 2px;
+  --card-accent-w: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --t-fast: 0ms;
+    --t-base: 0ms;
+  }
+}
