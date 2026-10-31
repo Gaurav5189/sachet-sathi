@@ -29,10 +29,16 @@ def test_health_does_not_leak_secrets() -> None:
         assert needle not in body
 
 
-def test_root_points_at_health() -> None:
+def test_root_serves_pwa_or_fallback() -> None:
     res = _client().get("/")
     assert res.status_code == 200
-    assert res.json()["health"] == "/api/health"
+    # Could be the PWA HTML (if web/ is present) or the JSON fallback
+    # Either way, the API health endpoint is linked.
+    content_type = res.headers.get("content-type", "")
+    if "text/html" in content_type:
+        assert "SachetSathi" in res.text
+    else:
+        assert res.json()["health"] == "/api/health"
 
 
 # ---- capability split: reports-in needs a token, digests-out need a channel --

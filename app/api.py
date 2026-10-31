@@ -2,21 +2,27 @@
 
 from __future__ import annotations
 
+import json
 import logging
+from pathlib import Path
 from typing import Any
 
-from fastapi import APIRouter, Query, Request
+from fastapi import APIRouter, BackgroundTasks, Query, Request
 from fastapi.responses import JSONResponse
 
 from app.alerts import AlertsService
 from app.digest import build_digest, send_digest
 from app.models import Database
+from app.reports import ReportError, ReportIn, create_report
 from app.telegram import TelegramClient
 from app.triage import TriageService
 
 logger = logging.getLogger("sachet.api")
 
 router = APIRouter(prefix="/api", tags=["sachet"])
+
+# web/ ships next to app/ in the image (see Dockerfile COPY).
+WEB_DIR = Path(__file__).resolve().parent.parent / "web"
 
 
 @router.get("/alerts")
@@ -50,6 +56,76 @@ def get_alerts(
             },
         )
     return JSONResponse(content=feed.to_payload())
+
+
+@router.get("/safetypack")
+def get_safety_pack() -> JSONResponse:
+    """Offline safety pack (contacts, do/don'ts, EN + Odia).
+
+    Served from `web/safety-pack.json` so the PWA and the API can never drift.
+    A missing pack is a deploy error, not an empty 200 — say so.
+    """
+    path = WEB_DIR / "safety-pack.json"
+    try:
+        pack = json.loads(path.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return JSONResponse(
+            status_code=503,
+            content={
+                "error": "safety_pack_missing",
+                "hint": "web/safety-pack.json is missing from the image; rebuild with the web/ directory.",
+            },
+        )
+    except json.JSONDecodeError as exc:
+        logger.error("safety pack is not valid JSON: %s", exc)
+        return JSONResponse(
+            status_code=503,
+            content={"error": "safety_pack_invalid", "hint": "Fix web/safety-pack.json."},
+        )
+    return JSONResponse(content=pack, headers={"Cache-Control": "public, max-age=300"})
+
+
+async def _triage_safely(triage: TriageService, incident_id: int) -> None:
+    """Background triage: a failure must never affect the reporter's response."""
+    try:
+        await triage.triage_incident(incident_id)
+    except Exception:  # noqa: BLE001 - already logged by the service
+        logger.exception("background triage failed for incident %s", incident_id)
+
+
+@router.post("/report")
+async def post_report(
+    request: Request,
+    payload: ReportIn,
+    background: BackgroundTasks,
+) -> JSONResponse:
+    """JSON report from the PWA — the offline queue's flush target.
+
+    Idempotent on `client_id`: the same queued report can be re-sent after a
+    timeout without creating a duplicate card.
+    """
+    db: Database = request.app.state.db
+    settings = request.app.state.settings
+    try:
+        row, created = create_report(db, settings, payload)
+    except ReportError as exc:
+        return JSONResponse(
+            status_code=413,
+            content={"error": "photo_too_large", "hint": str(exc)},
+        )
+
+    triage: TriageService = request.app.state.triage
+    if created and triage.available:
+        background.add_task(_triage_safely, triage, int(row["id"]))
+
+    return JSONResponse(
+        status_code=201 if created else 200,
+        content={
+            "incident": row,
+            "duplicate": not created,
+            "triage": "queued" if created and triage.available else "unavailable",
+        },
+    )
 
 
 @router.get("/incidents")

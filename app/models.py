@@ -223,22 +223,47 @@ class Database:
     ) -> int:
         """Idempotent on `report_id` — a replayed Telegram update or a re-flushed
         offline queue entry must not create a second card (RULES §3)."""
+        incident_id, _ = self.create_incident_once(
+            report_id=report_id,
+            reporter_tg_id=reporter_tg_id,
+            photo_path=photo_path,
+            caption=caption,
+        )
+        return incident_id
+
+    def create_incident_once(
+        self,
+        *,
+        report_id: str,
+        reporter_tg_id: int | None,
+        photo_path: str | None,
+        caption: str,
+    ) -> tuple[int, bool]:
+        """Same as `create_incident`, but also says whether this call inserted."""
         with self.connect() as conn:
-            conn.execute(
+            cursor = conn.execute(
                 "INSERT INTO incidents (report_id, reporter_tg_id, photo_path, caption, status, created_at) "
                 "VALUES (?, ?, ?, ?, 'pending', ?) "
                 "ON CONFLICT(report_id) DO NOTHING",
                 (report_id, reporter_tg_id, photo_path, caption, utcnow()),
             )
+            inserted = cursor.rowcount > 0
             row = conn.execute(
                 "SELECT id FROM incidents WHERE report_id = ?", (report_id,)
             ).fetchone()
-        return int(row["id"])
+        return int(row["id"]), inserted
 
     def get_incident(self, incident_id: int) -> dict[str, Any] | None:
         with self.connect() as conn:
             row = conn.execute(
                 "SELECT * FROM incidents WHERE id = ?", (incident_id,)
+            ).fetchone()
+        return dict(row) if row else None
+
+    def get_incident_by_report_id(self, report_id: str) -> dict[str, Any] | None:
+        with self.connect() as conn:
+            row = conn.execute(
+                "SELECT * FROM incidents WHERE report_id = ?", (report_id,)
             ).fetchone()
         return dict(row) if row else None
 

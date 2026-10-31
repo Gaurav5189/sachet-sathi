@@ -1,0 +1,96 @@
+{
+  "version": "2026-10-31",
+  "languages": ["en", "or"],
+  "notice_en": "Helplines below are public national and Odisha state numbers. Shelter locations are NOT included: they change per district and must be confirmed with your ward or panchayat. Verify any number before relying on it in an emergency.",
+  "notice_or": "ତଳେ ଥିବା ହେଲ୍ପଲାଇନ ନମ୍ବରଗୁଡ଼ିକ ସର୍ବସାଧାରଣ ଜାତୀୟ ଓ ଓଡ଼ିଶା ରାଜ୍ୟ ନମ୍ବର। ଆଶ୍ରୟସ୍ଥଳର ସ୍ଥାନ ଏଥିରେ ନାହିଁ — ତାହା ଜିଲ୍ଲା ଅନୁସାରେ ବଦଳେ ଏବଂ ୱାର୍ଡ କିମ୍ବା ପଞ୍ଚାୟତରୁ ନିଶ୍ଚିତ କରନ୍ତୁ।",
+  "emergency": [
+    {
+      "number": "112",
+      "label_en": "Emergency — police, fire, rescue",
+      "label_or": "ଆପାତକାଳୀନ — ପୋଲିସ, ଅଗ୍ନିଶମ, ଉଦ୍ଧାର"
+    },
+    {
+      "number": "108",
+      "label_en": "Ambulance",
+      "label_or": "ଆମ୍ବୁଲାନ୍ସ"
+    },
+    {
+      "number": "101",
+      "label_en": "Fire service",
+      "label_or": "ଅଗ୍ନିଶମ ସେବା"
+    },
+    {
+      "number": "1070",
+      "label_en": "Odisha State Emergency Operations Centre (OSDMA)",
+      "label_or": "ଓଡ଼ିଶା ରାଜ୍ୟ ଆପାତକାଳୀନ ପରିଚାଳନା କେନ୍ଦ୍ର (OSDMA)"
+    },
+    {
+      "number": "1078",
+      "label_en": "National disaster helpline (NDMA)",
+      "label_or": "ଜାତୀୟ ବିପର୍ଯ୍ୟୟ ହେଲ୍ପଲାଇନ (NDMA)"
+    },
+    {
+      "number": "104",
+      "label_en": "Health advice helpline",
+      "label_or": "ସ୍ୱାସ୍ଥ୍ୟ ପରାମର୍ଶ ହେଲ୍ପଲାଇନ"
+    }
+  ],
+  "do": [
+    {
+      "en": "Move to the nearest pucca building or cyclone shelter before the wind picks up.",
+      "or": "ପବନ ବଢ଼ିବା ପୂର୍ବରୁ ନିକଟସ୍ଥ ପକ୍କା ଘର କିମ୍ବା ବାତ୍ୟା ଆଶ୍ରୟସ୍ଥଳକୁ ଯାଆନ୍ତୁ।"
+    },
+    {
+      "en": "Carry drinking water, dry food, a torch, a power bank and your medicines.",
+      "or": "ପାନୀୟ ଜଳ, ଶୁଖିଲା ଖାଦ୍ୟ, ଟର୍ଚ୍ଚ, ପାୱାର ବ୍ୟାଙ୍କ ଏବଂ ଔଷଧ ସାଙ୍ଗରେ ନିଅନ୍ତୁ।"
+    },
+    {
+      "en": "Keep your phone charged and open this app once while you still have network.",
+      "or": "ଫୋନ୍ ଚାର୍ଜ ରଖନ୍ତୁ ଏବଂ ନେଟୱାର୍କ ଥିବା ସମୟରେ ଏହି ଆପ୍ ଥରେ ଖୋଲନ୍ତୁ।"
+    },
+    {
+      "en": "Report flooded roads, damaged shelters and trapped people with a photo.",
+      "or": "ବନ୍ୟା ରାସ୍ତା, କ୍ଷତିଗ୍ରସ୍ତ ଆଶ୍ରୟସ୍ଥଳ ଓ ଫସିଥିବା ଲୋକଙ୍କୁ ଫଟୋ ସହିତ ରିପୋର୍ଟ କରନ୍ତୁ।"
+    }
+  ],
+  "dont": [
+    {
+      "en": "Do not walk, swim or drive through moving water.",
+      "or": "ପ୍ରବାହିତ ପାଣିରେ ଚାଲନ୍ତୁ ନାହିଁ, ପହଁରନ୍ତୁ ନାହିଁ କିମ୍ବା ଗାଡ଼ି ଚଲାନ୍ତୁ ନାହିଁ।"
+    },
+    {
+      "en": "Do not touch fallen power lines or wet electrical poles.",
+      "or": "ପଡ଼ିଥିବା ବିଦ୍ୟୁତ ତାର କିମ୍ବା ଓଦା ବିଦ୍ୟୁତ ଖୁଣ୍ଟ ଛୁଇଁବେ ନାହିଁ।"
+    },
+    {
+      "en": "Do not trust forwarded messages; check the official alert card.",
+      "or": "ଫରୱାର୍ଡ ହୋଇଥିବା ସନ୍ଦେଶ ବିଶ୍ୱାସ କରନ୍ତୁ ନାହିଁ; ସରକାରୀ ଆଲର୍ଟ କାର୍ଡ ଦେଖନ୍ତୁ।"
+    },
+    {
+      "en": "Do not return home until the official alert is lifted.",
+      "or": "ସରକାରୀ ଆଲର୍ଟ ଉଠିବା ପର୍ଯ୍ୟନ୍ତ ଘରକୁ ଫେରନ୍ତୁ ନାହିଁ।"
+    }
+  ],
+  "checklist": [
+    {
+      "en": "Drinking water for 3 days",
+      "or": "୩ ଦିନର ପାନୀୟ ଜଳ"
+    },
+    {
+      "en": "Dry food that needs no cooking",
+      "or": "ରାନ୍ଧିବା ଆବଶ୍ୟକ ନଥିବା ଶୁଖିଲା ଖାଦ୍ୟ"
+    },
+    {
+      "en": "Torch and spare batteries",
+      "or": "ଟର୍ଚ୍ଚ ଓ ଅତିରିକ୍ତ ବ୍ୟାଟେରୀ"
+    },
+    {
+      "en": "Medicines and a copy of prescriptions",
+      "or": "ଔଷଧ ଓ ପ୍ରେସକ୍ରିପସନର କପି"
+    },
+    {
+      "en": "Documents in a plastic bag",
+      "or": "ପ୍ଲାଷ୍ଟିକ ବ୍ୟାଗରେ ଦସ୍ତାବେଜ"
+    }
+  ]
+}

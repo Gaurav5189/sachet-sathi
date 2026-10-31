@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>SachetSathi — cyclone field assistant</title>
+    <meta
+      name="description"
+      content="Official cyclone alerts, field reports and an offline safety pack for coastal Odisha."
+    />
+    <meta name="theme-color" content="#0b1220" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" href="/icon-192.png" sizes="192x192" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <header class="top">
+      <div class="brand">
+        <h1>SachetSathi</h1>
+        <small>ସଚେତ ସାଥୀ</small>
+      </div>
+      <p class="status" id="status" data-online="true" role="status">
+        <span class="dot" aria-hidden="true"></span>
+        <span id="status-text">online</span>
+      </p>
+    </header>
+
+    <p class="sr-only" id="announcer" aria-live="polite"></p>
+
+    <main>
+      <section aria-labelledby="alerts-h">
+        <div class="section-head">
+          <h2 id="alerts-h">Official alerts</h2>
+          <span class="tag" id="alerts-meta"></span>
+        </div>
+        <div class="cards" id="alerts" aria-live="polite">
+          <p class="empty">Loading alerts…</p>
+        </div>
+      </section>
+
+      <section aria-labelledby="pack-h">
+        <div class="section-head">
+          <h2 id="pack-h">Offline safety pack</h2>
+          <div class="filters" role="group" aria-label="Language">
+            <button class="chip" type="button" data-lang-btn="en" aria-pressed="true">EN</button>
+            <button class="chip" type="button" data-lang-btn="or" aria-pressed="false">ଓଡ଼ିଆ</button>
+          </div>
+        </div>
+        <div class="pack" id="pack">
+          <p class="empty">Loading safety pack…</p>
+        </div>
+      </section>
+
+      <section aria-labelledby="incidents-h">
+        <div class="section-head">
+          <h2 id="incidents-h">Field reports</h2>
+          <span class="tag" id="incidents-meta"></span>
+        </div>
+        <div class="filters" id="filters" role="group" aria-label="Filter by severity">
+          <button class="chip" type="button" data-severity="" aria-pressed="true">All</button>
+          <button class="chip" type="button" data-severity="severe" aria-pressed="false">Severe</button>
+          <button class="chip" type="button" data-severity="moderate" aria-pressed="false">Moderate</button>
+          <button class="chip" type="button" data-severity="low" aria-pressed="false">Low</button>
+        </div>
+        <div class="cards" id="incidents" aria-live="polite">
+          <p class="empty">Loading reports…</p>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>
+        Alerts: GDACS RSS (official). Reports: Telegram and this app. Triage is
+        <strong>AI-assisted</strong> (Gemma, open weights) and must be verified on site;
+        a card marked “rule-based fallback” was not classified by the model.
+      </p>
+      <p>
+        Offline: this page, the safety pack and unsent reports stay on your phone. Numbers
+        and shelter advice need local confirmation — see the notice in the pack.
+      </p>
+    </footer>
+
+    <button class="fab" id="open-report" type="button" aria-haspopup="dialog" aria-label="Report a field condition">
+      +
+    </button>
+
+    <dialog id="report-dialog" aria-labelledby="report-h">
+      <form class="sheet" id="report-form" method="dialog">
+        <h2 id="report-h">Report a field condition</h2>
+        <p class="hint">
+          Works offline: the report is saved on this phone and sent when you tap
+          “Send now”. A photo is optional.
+        </p>
+
+        <label for="caption">What do you see?</label>
+        <textarea
+          id="caption"
+          name="caption"
+          required
+          maxlength="1000"
+          placeholder="e.g. NH-16 flooded near Barang, knee-deep water, two buses stuck"
+        ></textarea>
+
+        <label for="photo">Photo (optional)</label>
+        <input id="photo" name="photo" type="file" accept="image/*" capture="environment" />
+        <img id="preview" class="preview" alt="" hidden />
+
+        <p class="hint" id="queue-hint">No unsent reports.</p>
+
+        <div class="row">
+          <button class="primary" id="save-report" type="submit">Save report</button>
+          <button class="ghost" id="send-now" type="button" disabled>Send now</button>
+          <button class="ghost" id="close-report" type="button">Close</button>
+        </div>
+        <p class="hint" id="form-status" aria-live="polite"></p>
+      </form>
+    </dialog>
+
+    <script src="/app.js" defer></script>
+  </body>
+</html>

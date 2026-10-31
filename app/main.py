@@ -13,11 +13,13 @@ from datetime import datetime, timezone
 from typing import AsyncIterator
 
 from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from app import __version__
 from app.alerts import AlertsService
-from app.api import router as api_router
+from app.api import WEB_DIR, router as api_router
 from app.config import Settings, get_settings
 from app.ingest import poll_forever
 from app.models import Database
@@ -125,15 +127,24 @@ def create_app(
             "alerts_cached": db.count_alerts(),
         }
 
-    @app.get("/")
-    async def root() -> dict:
-        return {
-            "app": "SachetSathi",
-            "version": __version__,
-            "health": "/api/health",
-            "docs": "/docs",
-            "note": "Dashboard (PWA) ships in phase 4.",
-        }
+    @app.exception_handler(RequestValidationError)
+    async def invalid_request(request: Request, exc: RequestValidationError) -> JSONResponse:
+        """RULES §3: a rejected body must say *what* to fix, not just 422."""
+        fields = [
+            {
+                "field": ".".join(str(part) for part in error.get("loc", ()) if part != "body"),
+                "problem": error.get("msg", "invalid"),
+            }
+            for error in exc.errors()
+        ]
+        return JSONResponse(
+            status_code=422,
+            content={
+                "error": "invalid_request",
+                "hint": "Fix the listed fields and retry. See /docs for the schema.",
+                "fields": fields,
+            },
+        )
 
     @app.exception_handler(Exception)
     async def unhandled(request: Request, exc: Exception) -> JSONResponse:
@@ -147,6 +158,23 @@ def create_app(
                 "dependency may be down.",
             },
         )
+
+    # The PWA is served from the same origin (no CORS, no second deploy) and at
+    # "/" so the service worker's scope covers the whole app. Mounted last so
+    # /api/* and /docs win.
+    if (WEB_DIR / "index.html").is_file():
+        app.mount("/", StaticFiles(directory=WEB_DIR, html=True), name="web")
+    else:
+
+        @app.get("/")
+        async def root() -> dict:
+            return {
+                "app": "SachetSathi",
+                "version": __version__,
+                "health": "/api/health",
+                "docs": "/docs",
+                "note": "web/ is missing from this build; the API still works.",
+            }
 
     return app
 
