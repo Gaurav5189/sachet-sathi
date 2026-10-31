@@ -19,8 +19,9 @@ FIXTURES_DIR = BASE_DIR / "fixtures"
 def load_dotenv(path: Path) -> None:
     """Load KEY=VALUE pairs from `path` into os.environ without overwriting.
 
-    Minimal on purpose: comments, blank lines, optional `export `, and
-    single/double quoted values. Anything fancier belongs in the shell.
+    Minimal on purpose: comments, blank lines, optional `export `, quoted values,
+    and inline `# comments` (a value copied from a documented template must not
+    end up with the comment glued to it). Anything fancier belongs in the shell.
     """
     if not path.is_file():
         return
@@ -34,7 +35,16 @@ def load_dotenv(path: Path) -> None:
         key, value = key.strip(), value.strip()
         if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
             value = value[1:-1]
-        os.environ.setdefault(key, value)
+        else:
+            for separator in (" #", "\t#"):
+                cut = value.find(separator)
+                if cut != -1:
+                    value = value[:cut]
+            value = value.strip()
+        if value.startswith("#"):
+            value = ""
+        if key:
+            os.environ.setdefault(key, value)
 
 
 def _flag(name: str, default: bool = False) -> bool:
@@ -50,6 +60,14 @@ def _int(name: str, default: int) -> int:
         return int(raw) if raw else default
     except ValueError:
         return default
+
+
+def _api_root(raw: str | None) -> str:
+    """A relay URL, or the public API. Garbage (e.g. a pasted comment) is ignored."""
+    value = (raw or "").strip().rstrip("/")
+    if value.startswith(("http://", "https://")):
+        return value
+    return "https://api.telegram.org"
 
 
 @dataclass(frozen=True)
@@ -102,8 +120,7 @@ def get_settings() -> Settings:
         telegram_bot_token=os.getenv("TELEGRAM_BOT_TOKEN", "").strip(),
         telegram_channel_id=os.getenv("TELEGRAM_CHANNEL_ID", "").strip(),
         telegram_api_root=(
-            os.getenv("TELEGRAM_API_ROOT", "").strip().rstrip("/")
-            or "https://api.telegram.org"
+            _api_root(os.getenv("TELEGRAM_API_ROOT", ""))
         ),
         gemini_api_key=os.getenv("GEMINI_API_KEY", "").strip(),
         gemma_model=os.getenv("GEMMA_MODEL", "gemma-3-27b-it").strip(),

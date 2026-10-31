@@ -22,6 +22,7 @@ from app.config import Settings, get_settings
 from app.ingest import poll_forever
 from app.models import Database
 from app.telegram import TelegramClient
+from app.triage import TriageService
 
 logger = logging.getLogger("sachet")
 logging.basicConfig(
@@ -46,6 +47,7 @@ def create_app(
     client = telegram_client or TelegramClient(
         settings.telegram_bot_token, api_root=settings.telegram_api_root
     )
+    triage = TriageService(settings, db)
 
     @asynccontextmanager
     async def lifespan(_: FastAPI) -> AsyncIterator[None]:
@@ -62,7 +64,7 @@ def create_app(
         poller: asyncio.Task[None] | None = None
         if settings.telegram_ready():
             poller = asyncio.create_task(
-                poll_forever(db=db, client=client, settings=settings, stop=stop),
+                poll_forever(db=db, client=client, settings=settings, stop=stop, triage=triage),
                 name="telegram-poller",
             )
         else:
@@ -95,6 +97,7 @@ def create_app(
     app.state.db = db
     app.state.alerts = AlertsService(settings, db)
     app.state.telegram = client
+    app.state.triage = triage
     app.include_router(api_router)
 
     @app.get("/api/health")

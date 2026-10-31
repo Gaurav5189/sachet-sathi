@@ -15,6 +15,7 @@ from typing import Any
 from app.config import Settings
 from app.models import Database
 from app.telegram import TelegramClient, deliver, flush_outbox
+from app.triage import TriageService
 
 logger = logging.getLogger("sachet.ingest")
 
@@ -72,6 +73,7 @@ async def handle_update(
     db: Database,
     client: TelegramClient,
     settings: Settings,
+    triage: TriageService | None = None,
 ) -> IngestOutcome:
     """One Telegram update → one incident (or one digest decision)."""
     if update.get("callback_query"):
@@ -130,6 +132,16 @@ async def handle_update(
         bool(photo_path),
         replied,
     )
+
+    if triage is not None and triage.available:
+        try:
+            card = await triage.triage_incident(incident_id)
+            await deliver(
+                db, client, chat_id=chat_id, kind="ack", text=triage_message(card)
+            )
+        except Exception:  # noqa: BLE001 - triage is never allowed to break ingest
+            logger.exception("triage failed for incident %s", incident_id)
+
     return IngestOutcome(
         incident_id=incident_id,
         report_id=report_id,
@@ -138,8 +150,23 @@ async def handle_update(
     )
 
 
-async def handle_callback(
-    query: dict[str, Any],
+def triage_message(card: dict[str, Any]) -> str:
+    """The follow-up card the reporter gets after triage."""
+    icon = {"severe": "🔴", "moderate": "🟠", "low": "🟢"}.get(card.get("severity") or "low", "⚪")
+    label = (
+        "AI-assisted triage (Gemma) — verify on site."
+        if card.get("triage_mode") == "gemma"
+        else "Rule-based fallback — needs human review."
+    )
+    return (
+        f"{icon} <b>{(card.get('severity') or 'low').upper()} · "
+        f"{(card.get('category') or 'other').upper()}</b> — report #{card.get('id')}\n"
+        f"{card.get('next_action') or ''}\n"
+        f"<i>{label}</i>"
+    )
+
+
+async def handle_callback(    query: dict[str, Any],
     *,
     db: Database,
     client: TelegramClient,
@@ -200,6 +227,7 @@ async def poll_forever(
     client: TelegramClient,
     settings: Settings,
     stop: asyncio.Event,
+    triage: TriageService | None = None,
 ) -> None:
     """The bot loop. One bad update must never end it (RULES §3)."""
     stored_offset = db.get_state("telegram_offset")
@@ -219,7 +247,9 @@ async def poll_forever(
             if isinstance(update_id, int):
                 offset = update_id + 1
             try:
-                await handle_update(update, db=db, client=client, settings=settings)
+                await handle_update(
+                    update, db=db, client=client, settings=settings, triage=triage
+                )
             except Exception:  # noqa: BLE001
                 logger.exception("update %s failed; continuing", update_id)
             if isinstance(update_id, int):

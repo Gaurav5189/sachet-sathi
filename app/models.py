@@ -83,6 +83,19 @@ CREATE TABLE IF NOT EXISTS state (
     key   TEXT PRIMARY KEY,
     value TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS ai_calls (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    incident_id  INTEGER,
+    model        TEXT NOT NULL,
+    mode         TEXT NOT NULL,              -- gemma | fallback
+    latency_ms   INTEGER NOT NULL DEFAULT 0,
+    prompt_chars INTEGER NOT NULL DEFAULT 0,
+    ok           INTEGER NOT NULL DEFAULT 1,
+    error        TEXT,
+    created_at   TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_ai_calls_created ON ai_calls (created_at DESC);
 """
 
 SEVERITY_RANK_SQL = (
@@ -343,3 +356,38 @@ class Database:
                 "ON CONFLICT(key) DO UPDATE SET value = excluded.value",
                 (key, value),
             )
+
+    # ---- ai call log (RULES §4: model, latency, honesty) ------------------
+    def log_ai_call(
+        self,
+        *,
+        incident_id: int | None,
+        model: str,
+        mode: str,
+        latency_ms: int,
+        prompt_chars: int,
+        ok: bool,
+        error: str | None = None,
+    ) -> None:
+        with self.connect() as conn:
+            conn.execute(
+                "INSERT INTO ai_calls (incident_id, model, mode, latency_ms, prompt_chars, ok, error, created_at) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                (
+                    incident_id,
+                    model,
+                    mode,
+                    latency_ms,
+                    prompt_chars,
+                    1 if ok else 0,
+                    (error or "")[:500] or None,
+                    utcnow(),
+                ),
+            )
+
+    def list_ai_calls(self, limit: int = 20) -> list[dict[str, Any]]:
+        with self.connect() as conn:
+            rows = conn.execute(
+                "SELECT * FROM ai_calls ORDER BY id DESC LIMIT ?", (limit,)
+            ).fetchall()
+        return [dict(r) for r in rows]

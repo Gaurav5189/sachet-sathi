@@ -12,6 +12,7 @@ from app.alerts import AlertsService
 from app.digest import build_digest, send_digest
 from app.models import Database
 from app.telegram import TelegramClient
+from app.triage import TriageService
 
 logger = logging.getLogger("sachet.api")
 
@@ -62,6 +63,33 @@ def get_incidents(
     db: Database = request.app.state.db
     incidents = db.list_incidents(status=status, severity=severity, limit=limit)
     return {"incidents": incidents, "count": len(incidents)}
+
+
+@router.post("/incidents/{incident_id}/triage")
+async def post_triage(
+    request: Request, incident_id: int, force: bool = False
+) -> JSONResponse:
+    """Run (or re-run) triage on one incident — the dashboard's 'retry' button."""
+    triage: TriageService = request.app.state.triage
+    if not triage.available:
+        return JSONResponse(
+            status_code=503,
+            content={
+                "error": "triage_not_configured",
+                "hint": "Set GEMINI_API_KEY in .env to enable Gemma triage.",
+            },
+        )
+    try:
+        card = await triage.triage_incident(incident_id, force=force)
+    except KeyError:
+        return JSONResponse(
+            status_code=404,
+            content={
+                "error": "incident_not_found",
+                "hint": f"No incident #{incident_id}. List them at /api/incidents.",
+            },
+        )
+    return JSONResponse(content=card)
 
 
 @router.get("/telegram/bot")
