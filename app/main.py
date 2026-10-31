@@ -104,7 +104,7 @@ def create_app(
             "status": "ok",
             "app": "SachetSathi",
             "version": __version__,
-            "phase": "p1-alerts",
+            "phase": "p2-telegram",
             "time": _now(),
             "demo_mode": settings.demo_mode,
             "capabilities": {
