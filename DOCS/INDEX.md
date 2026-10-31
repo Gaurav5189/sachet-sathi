@@ -1,8 +1,8 @@
 # Project Index & Map
 
 ## Active State
-- **Current Phase:** [Phase Number / Name]
-- **Current Task:** [Brief task description]
+- **Current Phase:** Phase 0 complete → Phase 1 (Alerts pipeline)
+- **Current Task:** P1 — GDACS RSS parse → `alerts` table + `/api/alerts` with fixture fallback
 
 ## Doc Map
 - **`RULES.md`**: Code formatting, framework rules, strict constraints. (path: DOCS/)
