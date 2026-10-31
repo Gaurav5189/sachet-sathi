@@ -62,17 +62,17 @@ curl http://localhost:8000/api/health
 ```
 OFFICIAL FEEDS                    FIELD REPORTERS             COMMUNITY
 ├─ GDACS RSS (live)               ├─ Telegram bot             ├─ Telegram channel
-├─ IMD bulletin (future)          │  photo + caption            │  digest broadcast
-└─ Fixture snapshot               │  ──→ DB (pending)          │  Acknowledge ✅ / Escalate ⏰
-         │                         │        ↓                  │
-         ▼                         │   Gemma triage             ▼
+├─ IMD bulletin (future)          │  photo + caption          │  digest broadcast
+└─ Fixture snapshot               │  ──→ DB (pending)         │  Acknowledge ✅ / Escalate ⏰
+         │                        │        ↓                  │
+         ▼                        │   Gemma triage             ▼
     FastAPI (DO App Platform)     │   ──→ strict JSON card     Digest post
     ├─ alerts.py                  │        ↓                   (every 5 min event trigger)
-    ├─ ingest.py (poll)          │   ack + card reply         │
-    ├─ triage.py                  │                             │
-    ├─ digest.py                  └──→ PWA dashboard          │
-    ├─ api.py                       (offline, IndexedDB)      │
-    └─ reports.py (PWA flush)                                    │
+    ├─ ingest.py (poll)           │   ack + card reply         │
+    ├─ triage.py                  │                            │
+    ├─ digest.py                  └──→ PWA dashboard           │
+    ├─ api.py                       (offline, IndexedDB)       │
+    └─ reports.py (PWA flush)                                  │
 ```
 
 Every external call has a timeout + retry + fallback. No bare `except`. AI outputs data only — it never sends messages, never mutates the DB, and never parses feeds. See [DOCS/ARCHITECTURE.md](DOCS/ARCHITECTURE.md) and [DOCS/RULES.md](DOCS/RULES.md).
@@ -94,6 +94,9 @@ curl http://localhost:8000/api/telegram/bot
 # → {"username":"sachet_sathi_bot","name":"Sachet-Sathi","deep_link":"https://t.me/sachet_sathi_bot"}
 ```
 
+> 📸 **Proof — bot ingest + triage card**: user sends photo → bot replies with incident number + ack → background triage returns structured card (`MODERATE · DAMAGE`, `priority 2`, Odia summary, action) → user sees full card in chat.
+> ![Bot ingest and triage card](assets/telegram-bot-report-triage.png)
+
 ### Digest out → `@sachet_sathi_club`
 The server builds a digest (freshest official alert + top triaged reports) and posts it to the configured channel. It includes inline buttons:
 - **Acknowledge ✅** — edited in place, keyboard removed
@@ -103,6 +106,9 @@ The digest is triggered **event-based** (new severe incident OR new relevant off
 ```bash
 curl -X POST http://localhost:8000/api/digest
 ```
+
+> 📸 **Proof — digest in `@sachet_sathi_club`**: official ARNAB-26 alert (Red), 3 field reports, Acknowledge button visible. Bot (`Sachet-Sathi`) promoted admin.
+> ![Digest in Telegram channel](assets/telegram-digest-channel.png)
 
 ---
 
