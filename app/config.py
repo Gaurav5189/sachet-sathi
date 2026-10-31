@@ -61,6 +61,7 @@ class Settings:
     database_url: str
     telegram_bot_token: str
     telegram_channel_id: str
+    telegram_api_root: str
     gemini_api_key: str
     gemma_model: str
     gdacs_rss_url: str
@@ -100,6 +101,10 @@ def get_settings() -> Settings:
         database_url=os.getenv("DATABASE_URL", "").strip(),
         telegram_bot_token=os.getenv("TELEGRAM_BOT_TOKEN", "").strip(),
         telegram_channel_id=os.getenv("TELEGRAM_CHANNEL_ID", "").strip(),
+        telegram_api_root=(
+            os.getenv("TELEGRAM_API_ROOT", "").strip().rstrip("/")
+            or "https://api.telegram.org"
+        ),
         gemini_api_key=os.getenv("GEMINI_API_KEY", "").strip(),
         gemma_model=os.getenv("GEMMA_MODEL", "gemma-3-27b-it").strip(),
         gdacs_rss_url=(

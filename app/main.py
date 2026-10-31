@@ -6,6 +6,7 @@ Phase 0 scope: boot + `/api/health`. Routers land here as they are built
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
@@ -18,7 +19,9 @@ from app import __version__
 from app.alerts import AlertsService
 from app.api import router as api_router
 from app.config import Settings, get_settings
+from app.ingest import poll_forever
 from app.models import Database
+from app.telegram import TelegramClient
 
 logger = logging.getLogger("sachet")
 logging.basicConfig(
@@ -31,12 +34,18 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="seconds")
 
 
-def create_app(settings: Settings | None = None) -> FastAPI:
+def create_app(
+    settings: Settings | None = None,
+    telegram_client: TelegramClient | None = None,
+) -> FastAPI:
     settings = settings or get_settings()
     settings.ensure_dirs()
 
     db = Database(settings.sqlite_path)
     db.init()
+    client = telegram_client or TelegramClient(
+        settings.telegram_bot_token, api_root=settings.telegram_api_root
+    )
 
     @asynccontextmanager
     async def lifespan(_: FastAPI) -> AsyncIterator[None]:
@@ -49,7 +58,28 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             "on" if settings.telegram_ready() else "off",
             "on" if settings.ai_ready() else "off",
         )
-        yield
+        stop = asyncio.Event()
+        poller: asyncio.Task[None] | None = None
+        if settings.telegram_ready():
+            poller = asyncio.create_task(
+                poll_forever(db=db, client=client, settings=settings, stop=stop),
+                name="telegram-poller",
+            )
+        else:
+            logger.info("telegram poller idle (no bot token / channel id)")
+        try:
+            yield
+        finally:
+            stop.set()
+            if poller is not None:
+                poller.cancel()
+                try:
+                    await poller
+                except asyncio.CancelledError:
+                    pass
+                except Exception:  # noqa: BLE001 - shutdown is best-effort
+                    logger.exception("poller shutdown raised")
+            await client.aclose()
 
     app = FastAPI(
         title="SachetSathi",
@@ -64,6 +94,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.settings = settings
     app.state.db = db
     app.state.alerts = AlertsService(settings, db)
+    app.state.telegram = client
     app.include_router(api_router)
 
     @app.get("/api/health")

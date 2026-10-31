@@ -35,3 +35,6 @@ Thumbs.db
 .idea/
 .vscode/
 *.swp
+
+# --- reference repo, local only (never commit) ---
+telegram-send-demo/
