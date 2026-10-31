@@ -13,6 +13,7 @@
   <a href="#"><img alt="PWA" src="https://img.shields.io/badge/PWA-offline%20ready-blueviolet" /></a>
   <a href="#"><img alt="AI" src="https://img.shields.io/badge/AI-Gemma%204-26b%20(open%20weights)-orange" /></a>
   <a href="#"><img alt="Tests" src="https://img.shields.io/badge/tests-51-green" /></a>
+  <a href="assets/SachetSathi_v2.pptx"><img alt="Pitch Deck" src="https://img.shields.io/badge/Pitch%20Deck-PPTX%20Download-informational" /></a>
 </p>
 
 ---
@@ -227,6 +228,10 @@ sachet-sathi/
 ---
 
 ## 🏆 MLH / Hackathon submission
+
+**Presentation / Pitch Deck:**
+- 📊 **[Download Pitch Deck (SachetSathi_v2.pptx)](assets/SachetSathi_v2.pptx)** — Full presentation deck with problem statement, architecture, Gemma 4 triage flow, and impact breakdown.
+- 📄 **[Pitch Architecture & Script Guide (explanation.md)](explanation.md)** — Slide-by-slide script and judging alignment notes.
 
 **Tracks:**
 - **Best Open-Source AI Project** (DigitalOcean) — open-weight Gemma load, no proprietary model (main for this project)
