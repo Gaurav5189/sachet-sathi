@@ -1,0 +1,9 @@
+[project]
+name = "sachet-sathi"
+version = "0.1.0"
+description = "Field assistant for the Odisha cyclone: official alerts + Telegram reports + Gemma triage + offline PWA"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

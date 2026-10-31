@@ -1,0 +1,8 @@
+# Runtime deps — approved set only (DOCS/RULES.md §1). Floors, not guesses at today's latest.
+fastapi>=0.115
+uvicorn[standard]>=0.30
+pydantic>=2.7
+httpx>=0.27
+python-telegram-bot>=21.0
+google-genai>=0.3
+apscheduler>=3.10

@@ -1,0 +1,22 @@
+# Works with `podman compose up` (this machine) and `docker compose up` (judges).
+# Secrets are read from `.env` via ${VAR:-default} interpolation — `.env` is git-ignored.
+services:
+  api:
+    build: .
+    image: sachet-sathi:local
+    container_name: sachet-sathi-api
+    ports:
+      - "${PORT:-8000}:8000"
+    environment:
+      APP_ENV: "${APP_ENV:-local}"
+      DEMO_MODE: "${DEMO_MODE:-0}"
+      DATA_DIR: /app/data
+      DATABASE_URL: "${DATABASE_URL:-}"
+      TELEGRAM_BOT_TOKEN: "${TELEGRAM_BOT_TOKEN:-}"
+      TELEGRAM_CHANNEL_ID: "${TELEGRAM_CHANNEL_ID:-}"
+      GEMINI_API_KEY: "${GEMINI_API_KEY:-}"
+      GEMMA_MODEL: "${GEMMA_MODEL:-gemma-3-27b-it}"
+      GDACS_RSS_URL: "${GDACS_RSS_URL:-https://www.gdacs.org/xml/rss.xml}"
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
