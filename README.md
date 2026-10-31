@@ -232,7 +232,6 @@ sachet-sathi/
 
 **Presentation / Pitch Deck:**
 - 📊 **[Download Pitch Deck (SachetSathi_v2.pptx)](assets/SachetSathi_v2.pptx)** — Full presentation deck with problem statement, architecture, Gemma 4 triage flow, and impact breakdown.
-- 📄 **[Pitch Architecture & Script Guide (explanation.md)](explanation.md)** — Slide-by-slide script and judging alignment notes.
 
 **Tracks:**
 - **Best Open-Source AI Project** (DigitalOcean) — open-weight Gemma load, no proprietary model (main for this project)
